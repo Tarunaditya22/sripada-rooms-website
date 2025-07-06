@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sripada Maharaj Rooms</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("fhYJbDEGLq7OXlw2J");
+        })();
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: #ffffff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .logo {
+            width: 200px;
+            height: auto;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #FF7043;
+        }
+        form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2196F3;
+        }
+        form input, form select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #FF7043;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: #F4511E;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .button-container button {
+            width: 48%;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #FF7043;
+            color: white;
+        }
+        .conditional-input {
+            display: none;
+        }
+        #payments {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+        #loginPage, #bookingPage {
+            display: none;
+        }
+        #photoCapture {
+            display: block;
+            margin-top: 10px;
+            text-align: center;
+        }
+        #video {
+            margin-top: 10px;
+            width: 100%;
+            max-width: 300px;
+        }
+        #canvas {
+            display: none;
+        }
+        #payments img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+        }
+        #logoutButton {
+            width: auto;
+            float: right;
+            margin-bottom: 20px;
+        }
+        .datetime-group {
+            display: flex;
+            gap: 20px;
+        }
+        .datetime-group > div {
+            flex: 1;
+        }
+        html, body {
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        .sync-status {
+            background: #e8f5e8;
+            color: #27ae60;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .sync-status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .sync-status.syncing {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+        @media (max-width: 768px) {
+            .datetime-group {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loginPage" class="container">
+        <img src="/api/placeholder/200/200" alt="Sripada Maharaj Rooms Logo" class="logo">
+        <h1>Login</h1>
+        <form id="loginForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" required>
+
+            <button type="button" onclick="loginUser()">Login</button>
+        </form>
+    </div>
+
+    <div id="bookingPage" class="container">
+        <img src="/api/placeholder/200/200" alt="Sripada Maharaj Rooms Logo" class="logo">
+        <h1>Sripada Maharaj Rooms</h1>
+        
+        <!-- Sync Status Indicator -->
+        <div id="syncStatus" class="sync-status">
+            🔄 Connecting to cloud storage...
+        </div>
+        
+        <button id="logoutButton" onclick="logoutUser()">Logout</button>
+        <form id="bookingForm">
+            <label for="name">Name:</label>
+            <input type="text" id="name" required>
+
+            <label for="phone">Phone:</label>
+            <input type="text" id="phone" required pattern="\d{10}">
+
+            <div class="datetime-group">
+                <div>
+                    <label for="arrivalDate">Arrival Date:</label>
+                    <input type="date" id="arrivalDate" required>
+                </div>
+                <div>
+                    <label for="arrivalTime">Arrival Time:</label>
+                    <input type="time" id="arrivalTime" required>
+                </div>
+            </div>
+
+            <div class="datetime-group">
+                <div>
+                    <label for="departureDate">Departure Date:</label>
+                    <input type="date" id="departureDate" required>
+                </div>
+                <div>
+                    <label for="departureTime">Departure Time:</label>
+                    <input type="time" id="departureTime" required>
+                </div>
+            </div>
+
+            <label for="days">Number of Days:</label>
+            <input type="number" id="days" required min="1">
+
+            <label for="noOfRooms">Number of Rooms:</label>
+            <input type="number" id="noOfRooms" required min="1">
+
+            <label for="totalCharges">Total Charges (Final Amount):</label>
+            <input type="number" id="totalCharges" required min="1">
+
+            <label for="roomType">Room Type:</label>
+            <select id="roomType" required>
+                <option value="" disabled selected>Select room type</option>
+                <option value="ac">A/C</option>
+                <option value="non-ac">Non-A/C</option>
+            </select>
+
+            <label for="paymentMethod">Payment Method:</label>
+            <select id="paymentMethod" required>
+                <option value="" disabled selected>Select payment method</option>
+                <option value="GPay">GPay</option>
+                <option value="PhonePe">PhonePe</option>
+                <option value="Cash">Cash</option>
+            </select>
+
+            <label for="paymentType">Payment Type:</label>
+            <select id="paymentType" onchange="updatePaymentType()" required>
+                <option value="" disabled selected>Select payment type</option>
+                <option value="Full Payment">Full Payment</option>
+                <option value="Advance">Advance</option>
+                <option value="Remaining Advance">Remaining Advance</option>
+            </select>
+
+            <div id="advanceFields" class="conditional-input">
+                <label for="advanceAmountNow">Advance Amount Being Paid Now:</label>
+                <input type="number" id="advanceAmountNow" min="0">
+
+                <label for="remainingAmount">Remaining Amount Left:</label>
+                <input type="number" id="remainingAmount" min="0">
+            </div>
+
+            <div id="remainingAdvanceFields" class="conditional-input">
+                <label for="advanceAlreadyPaid">Advance Amount Already Paid:</label>
+                <input type="number" id="advanceAlreadyPaid" min="0">
+
+                <label for="remainingBeingPaid">Remaining Amount Being Paid:</label>
+                <input type="number" id="remainingBeingPaid" min="0">
+            </div>
+
+            <label for="paymentStatus">Payment Status:</label>
+            <select id="paymentStatus" required>
+                <option value="" disabled selected>Select status</option>
+                <option value="Completed">Completed</option>
+                <option value="Pending">Pending</option>
+            </select>
+
+            <button type="button" onclick="submitPaymentAndDownloadInvoice()">Submit Payment & Download PDF</button>
+        </form>
+
+        <label for="customerDetails">Customer Details:</label>
+        <select id="customerDetails" onchange="showCustomerDetails()">
+            <option value="" disabled selected>Select an option</option>
+            <option value="aadhar">Aadhar Number</option>
+            <option value="takePhoto">Take Photo</option>
+        </select>
+
+        <div id="aadharInput" class="conditional-input">
+            <label for="aadharNumber">Enter Aadhar Number:</label>
+            <input type="text" id="aadharNumber" maxlength="12" pattern="\d{12}">
+        </div>
+
+        <div id="photoCapture" class="conditional-input">
+            <video id="video" width="300" height="200" autoplay></video>
+            <canvas id="canvas"></canvas>
+            <button type="button" onclick="capturePhoto()">Capture Photo</button>
+        </div>
+
+        <div id="payments"></div>
+
+        <div class="button-container">
+            <button type="button" onclick="showPayments()">Show Previous Payments</button>
+            <button type="button" onclick="clearPayments()">Clear Payment History</button>
+        </div>
+        <div class="button-container">
+            <button type="button" onclick="downloadPaymentHistory()">Download Payment History (PDF)</button>
+            <button type="button" onclick="forceSyncNow()">🔄 Sync Now</button>
+        </div>
+    </div>
+
+    <script>
+        // ===== GITHUB STORAGE CONFIGURATION =====
+        // Replace these values with your actual GitHub details
+        const GITHUB_CONFIG = {
+            owner: 'Tarunaditya22',          // Replace with your GitHub username
+            repo: 'sripada-rooms-data',             // Replace with your repository name
+            token: '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',             // Replace with your GitHub token
+            branch: 'main'
+        };
+
+        // ===== GITHUB STORAGE CLASS =====
+        class GitHubStorage {
+            constructor(config) {
+                this.config = config;
+                this.baseURL = `https://api.github.com/repos/${config.owner}/${config.repo}`;
+            }
+
+            async saveData(filename, data) {
+                try {
+                    const content = btoa(JSON.stringify(data, null, 2));
+                    
+                    // Check if file exists to get SHA
+                    let sha = null;
+                    try {
+                        const existingFile = await this.getData(filename);
+                        sha = existingFile.sha;
+                    } catch (e) {
+                        // File doesn't exist, that's ok
+                    }
+
+                    const response = await fetch(`${this.baseURL}/contents/${filename}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `token ${this.config.token}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: `Update ${filename} - ${new Date().toLocaleString()}`,
+                            content: content,
+                            branch: this.config.branch,
+                            ...(sha && { sha })
+                        })
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`GitHub API error: ${response.status}`);
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    console.error('Error saving to GitHub:', error);
+                    throw error;
+                }
+            }
+
+            async loadData(filename) {
+                try {
+                    const response = await fetch(`${this.baseURL}/contents/${filename}?ref=${this.config.branch}`, {
+                        headers: {
+                            'Authorization': `token ${this.config.token}`,
+                        }
+                    });
+
+                    if (!response.ok) {
+                        if (response.status === 404) {
+                            return null; // File doesn't exist
+                        }
+                        throw new Error(`GitHub API error: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    return JSON.parse(atob(data.content));
+                } catch (error) {
+                    console.error('Error loading from GitHub:', error);
+                    return null;
+                }
+            }
+
+            async getData(filename) {
+                const response = await fetch(`${this.baseURL}/contents/${filename}?ref=${this.config.branch}`, {
+                    headers: {
+                        'Authorization': `token ${this.config.token}`,
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`GitHub API error: ${response.status}`);
+                }
+
+                return await response.json();
+            }
+
+            async checkConnection() {
+                try {
+                    const response = await fetch(`${this.baseURL}`, {
+                        headers: {
+                            'Authorization': `token ${this.config.token}`,
+                        }
+                    });
+                    return response.ok;
+                } catch (error) {
+                    return false;
+                }
+            }
+        }
+
+        // ===== INITIALIZE GITHUB STORAGE =====
+        const githubStorage = new GitHubStorage(GITHUB_CONFIG);
+
+        // ===== GLOBAL VARIABLES =====
+        const users = [
+            { username: "manager", password: "bujji180", role: "manager" },
+            { username: "owner", password: "karthik@1979", role: "owner" }
+        ];
+
+        let payments = [];
+        let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser')) || null;
+        let photoDataUrl = null;
+        let isOnline = false;
+
+        // ===== SYNC STATUS FUNCTIONS =====
+        function updateSyncStatus(message, type = 'success') {
+            const statusElement = document.getElementById('syncStatus');
+            if (!statusElement) return;
+
+            statusElement.className = `sync-status ${type}`;
+            
+            const icons = {
+                success: '✅',
+                error: '❌',
+                syncing: '🔄'
+            };
+
+            statusElement.textContent = `${icons[type]} ${message}`;
+        }
+
+        // ===== ENHANCED STORAGE FUNCTIONS =====
+        async function savePayments() {
+            try {
+                updateSyncStatus('Syncing to cloud...', 'syncing');
+                
+                // Save to GitHub
+                await githubStorage.saveData('payments.json', payments);
+                
+                // Also save locally as backup
+                localStorage.setItem('payments', JSON.stringify(payments));
+                
+                console.log('✅ Payments saved to GitHub successfully');
+                updateSyncStatus('Data synced to cloud!', 'success');
+                isOnline = true;
+            } catch (error) {
+                console.warn('❌ Could not save to GitHub:', error);
+                localStorage.setItem('payments', JSON.stringify(payments));
+                updateSyncStatus('Saved locally only - check connection', 'error');
+                isOnline = false;
+            }
+        }
+
+        async function loadPayments() {
+            try {
+                updateSyncStatus('Loading from cloud...', 'syncing');
+                
+                // Try to load from GitHub first
+                const githubData = await githubStorage.loadData('payments.json');
+                
+                if (githubData && Array.isArray(githubData)) {
+                    payments = githubData;
+                    console.log('✅ Loaded payments from GitHub');
+                    updateSyncStatus('Data loaded from cloud!', 'success');
+                    isOnline = true;
+                } else {
+                    // Fallback to localStorage
+                    const localData = localStorage.getItem('payments');
+                    if (localData) {
+                        payments = JSON.parse(localData);
+                        console.log('📱 Loaded payments from local storage');
+                        updateSyncStatus('Using offline data', 'error');
+                    } else {
+                        payments = [];
+                        updateSyncStatus('No data found - ready for new bookings', 'success');
+                    }
+                    isOnline = false;
+                }
+            } catch (error) {
+                console.warn('❌ Error loading from GitHub:', error);
+                
+                // Fallback to localStorage
+                const localData = localStorage.getItem('payments');
+                if (localData) {
+                    payments = JSON.parse(localData);
+                    updateSyncStatus('Using offline backup', 'error');
+                } else {
+                    payments = [];
+                    updateSyncStatus('Offline mode - limited functionality', 'error');
+                }
+                isOnline = false;
+            }
+        }
+
+        // ===== FORCE SYNC FUNCTION =====
+        async function forceSyncNow() {
+            await savePayments();
+            await loadPayments();
+            showPayments();
+        }
+
+        // ===== ORIGINAL FUNCTIONS (ENHANCED) =====
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadPayments();
+            updateUI();
+            showPayments();
+            
+            // Check connection status every 30 seconds
+            setInterval(async () => {
+                const connected = await githubStorage.checkConnection();
+                if (connected && !isOnline) {
+                    // Connection restored, try to sync
+                    await savePayments();
+                }
+            }, 30000);
+        });
+
+        function updateUI() {
+            document.getElementById("loginPage").style.display = loggedInUser ? "none" : "block";
+            document.getElementById("bookingPage").style.display = loggedInUser ? "block" : "none";
+        }
+
+        function loginUser() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                loggedInUser = user;
+                localStorage.setItem('loggedInUser', JSON.stringify(user));
+                updateUI();
+            } else {
+                alert("Invalid username or password");
+            }
+        }
+
+        function logoutUser() {
+            loggedInUser = null;
+            localStorage.removeItem('loggedInUser');
+            updateUI();
+        }
+
+        function updatePaymentType() {
+            const paymentType = document.getElementById("paymentType").value;
+            document.getElementById("advanceFields").style.display = 
+                paymentType === "Advance" ? "block" : "none";
+            document.getElementById("remainingAdvanceFields").style.display = 
+                paymentType === "Remaining Advance" ? "block" : "none";
+        }
+
+        async function submitPaymentAndDownloadInvoice() {
+            const formData = {
+                id: 'BOOK' + Date.now(), // Add unique ID
+                name: document.getElementById("name").value,
+                phone: document.getElementById("phone").value,
+                arrivalDate: document.getElementById("arrivalDate").value,
+                arrivalTime: document.getElementById("arrivalTime").value,
+                departureDate: document.getElementById("departureDate").value,
+                departureTime: document.getElementById("departureTime").value,
+                days: document.getElementById("days").value,
+                noOfRooms: document.getElementById("noOfRooms").value,
+                totalCharges: document.getElementById("totalCharges").value,
+                roomType: document.getElementById("roomType").value,
+                paymentMethod: document.getElementById("paymentMethod").value,
+                paymentType: document.getElementById("paymentType").value,
+                paymentStatus: document.getElementById("paymentStatus").value,
+                advanceAmountNow: document.getElementById("advanceAmountNow").value || "0",
+                remainingAmount: document.getElementById("remainingAmount").value || "0",
+                advanceAlreadyPaid: document.getElementById("advanceAlreadyPaid").value || "0",
+                remainingBeingPaid: document.getElementById("remainingBeingPaid").value || "0",
+                aadharNumber: document.getElementById("aadharNumber").value,
+                photo: photoDataUrl,
+                date: new Date().toLocaleString(),
+                submittedBy: loggedInUser ? loggedInUser.username : 'Unknown'
+            };
+
+            try {
+                const pdfDoc = await generateInvoicePDF(formData);
+                const emailMessage = `
+                    Booking ID: ${formData.id}
+                    Date: ${formData.date}
+                    Name: ${formData.name}
+                    Phone: ${formData.phone}
+                    Arrival: ${formData.arrivalDate} ${formData.arrivalTime}
+                    Departure: ${formData.departureDate} ${formData.departureTime}
+                    Days: ${formData.days}
+                    Rooms: ${formData.noOfRooms}
+                    Room Type: ${formData.roomType}
+                    Total Amount: ₹${formData.totalCharges}
+                    Payment Method: ${formData.paymentMethod}
+                    Payment Type: ${formData.paymentType}
+                    Payment Status: ${formData.paymentStatus}
+                    Advance Paid: ₹${formData.advanceAmountNow}
+                    Remaining: ₹${formData.remainingAmount}
+                    Previously Paid: ₹${formData.advanceAlreadyPaid}
+                    Paid Now: ₹${formData.remainingBeingPaid}
+                    Submitted by: ${formData.submittedBy}
+                    Photo: ${formData.photo ? 'Attached' : 'Not Available'}`;
+
+                await emailjs.send('service_o9bzhid', 'template_8a4wvb9', {
+                    to_name: "PLEASE UPDATE",
+                    from_name: "SRIPADA MAHARAJ ROOMS",
+                    message: emailMessage,
+                    to_email: "sripadamaharajrooms@gmail.com"
+                });
+
+                console.log('Email sent successfully');
+                alert('Booking confirmed and invoice sent by email!');
+
+                payments.push(formData);
+                await savePayments(); // Save to GitHub
+                pdfDoc.save(`invoice_${formData.name}_${new Date().toISOString().slice(0,10)}.pdf`);
+                showPayments();
+
+                // Reset form
+                document.getElementById('bookingForm').reset();
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('There was an error processing your request. Please try again.');
+            }
+        }
+
+        async function generateInvoicePDF(payment) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.addImage("/api/placeholder/200/200", 'JPEG', 10, 10, 40, 40);
+            
+            doc.setFontSize(20);
+            doc.text("Sripada Maharaj Rooms - Invoice", 60, 30);
+            
+            doc.setFontSize(12);
+            doc.text(`Booking ID: ${payment.id}`, 20, 50);
+            doc.text(`Date: ${payment.date}`, 20, 60);
+
+            const content = [
+                ["Name:", payment.name],
+                ["Phone:", payment.phone],
+                ["Arrival:", `${payment.arrivalDate} ${payment.arrivalTime}`],
+                ["Departure:", `${payment.departureDate} ${payment.departureTime}`],
+                ["Days:", payment.days],
+                ["Rooms:", payment.noOfRooms],
+                ["Room Type:", payment.roomType],
+                ["Total Amount:", `₹${payment.totalCharges}`],
+                ["Payment Method:", payment.paymentMethod],
+                ["Payment Type:", payment.paymentType],
+                ["Payment Status:", payment.paymentStatus]
+            ];
+
+            if (payment.paymentType === "Advance") {
+                content.push(
+                    ["Advance Paid:", `₹${payment.advanceAmountNow}`],
+                    ["Remaining:", `₹${payment.remainingAmount}`]
+                );
+            } else if (payment.paymentType === "Remaining Advance") {
+                content.push(
+                    ["Previously Paid:", `₹${payment.advanceAlreadyPaid}`],
+                    ["Paid Now:", `₹${payment.remainingBeingPaid}`]
+                );
+            }
+
+            doc.autoTable({
+                body: content,
+                startY: 75,
+                theme: 'grid',
+                styles: { fontSize: 10 }
+            });
+
+            if (payment.photo) {
+                doc.addImage(payment.photo, 'PNG', 20, doc.lastAutoTable.finalY + 10, 50, 50);
+            }
+
+            return doc;
+        }
+
+        async function downloadPaymentHistory() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape');
+
+            doc.addImage("/api/placeholder/200/200", 'JPEG', 14, 10, 30, 30);
+            doc.setFontSize(20);
+            doc.text("Sripada Maharaj Rooms - Payment History", 50, 25);
+            doc.setFontSize(12);
+            doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 40);
+            doc.text(`Total Records: ${payments.length}`, 14, 50);
+
+            const pdfHeaders = [[
+                "Booking ID",
+                "Date",
+                "Name",
+                "Phone",
+                "Arrival",
+                "Departure",
+                "Days",
+                "Rooms",
+                "Room Type",
+                "Total Amount",
+                "Payment Method",
+                "Payment Type",
+                "Payment Status",
+                "Advance Paid",
+                "Remaining"
+            ]];
+
+            const pdfData = payments.map(payment => [
+                payment.id || 'N/A',
+                payment.date,
+                payment.name,
+                payment.phone,
+                `${payment.arrivalDate} ${payment.arrivalTime}`,
+                `${payment.departureDate} ${payment.departureTime}`,
+                payment.days,
+                payment.noOfRooms,
+                payment.roomType,
+                `₹${payment.totalCharges}`,
+                payment.paymentMethod,
+                payment.paymentType,
+                payment.paymentStatus,
+                `₹${payment.advanceAmountNow || '0'}`,
+                `₹${payment.remainingAmount || '0'}`
+            ]);
+
+            doc.autoTable({
+                head: pdfHeaders,
+                body: pdfData,
+                startY: 55,
+                styles: { fontSize: 7, cellPadding: 2 },
+                columnStyles: {
+                    0: { cellWidth: 20 }, // Booking ID
+                    1: { cellWidth: 20 }, // Date
+                    2: { cellWidth: 20 }, // Name
+                    3: { cellWidth: 15 }, // Phone
+                    4: { cellWidth: 20 }, // Arrival
+                    5: { cellWidth: 20 }, // Departure
+                    6: { cellWidth: 10 }, // Days
+                    7: { cellWidth: 10 }, // Rooms
+                    8: { cellWidth: 15 }, // Room Type
+                    9: { cellWidth: 15 }, // Total Amount
+                    10: { cellWidth: 15 }, // Payment Method
+                    11: { cellWidth: 15 }, // Payment Type
+                    12: { cellWidth: 15 }, // Payment Status
+                    13: { cellWidth: 15 }, // Advance Paid
+                    14: { cellWidth: 15 }  // Remaining
+                }
+            });
+
+            doc.save('sripada_rooms_payment_history.pdf');
+
+            // Email the report
+            let emailContent = `
+                <h2 style="color: #FF7043;">Sripada Maharaj Rooms - Payment History</h2>
+                <p>Generated on: ${new Date().toLocaleString()}</p>
+                <p>Total Records: ${payments.length}</p>
+                <p>Cloud Sync Status: ${isOnline ? '✅ Online' : '❌ Offline'}</p>
+            `;
+
+            try {
+                await emailjs.send('service_o9bzhid', 'template_8a4wvb9', {
+                    to_name: "Admin",
+                    from_name: "Sripada Maharaj Rooms",
+                    message: emailContent,
+                    to_email: "sripadamaharajrooms@gmail.com"
+                });
+
+                console.log('Payment history email sent successfully');
+                alert('Payment history has been downloaded and sent by email!');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error sending payment history by email. The PDF has been downloaded locally.');
+            }
+        }
+
+        function showPayments() {
+            const container = document.getElementById("payments");
+            container.innerHTML = "<h2>Payment History</h2>";
+            
+            if (payments.length === 0) {
+                container.innerHTML += "<p>No payment records found.</p>";
+                return;
+            }
+
+            // Add summary
+            const summary = document.createElement('div');
+            summary.innerHTML = `
+                <p><strong>Total Bookings:</strong> ${payments.length}</p>
+                <p><strong>Sync Status:</strong> ${isOnline ? '✅ Cloud Synced' : '❌ Local Only'}</p>
+                <hr>
+            `;
+            container.appendChild(summary);
+
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Date</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Arrival</th>
+                    <th>Departure</th>
+                    <th>Days</th>
+                    <th>Rooms</th>
+                    <th>Room Type</th>
+                    <th>Total Amount</th>
+                    <th>Payment Method</th>
+                    <th>Payment Type</th>
+                    <th>Payment Status</th>
+                    <th>Advance Paid</th>
+                    <th>Remaining</th>
+                    <th>Previously Paid</th>
+                    <th>Paid Now</th>
+                    <th>Photo</th>
+                    <th>Submitted By</th>
+                </tr>
+            `;
+
+            payments.forEach(payment => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${payment.id || 'N/A'}</td>
+                    <td>${payment.date}</td>
+                    <td>${payment.name}</td>
+                    <td>${payment.phone}</td>
+                    <td>${payment.arrivalDate} ${payment.arrivalTime}</td>
+                    <td>${payment.departureDate} ${payment.departureTime}</td>
+                    <td>${payment.days}</td>
+                    <td>${payment.noOfRooms}</td>
+                    <td>${payment.roomType}</td>
+                    <td>₹${payment.totalCharges}</td>
+                    <td>${payment.paymentMethod}</td>
+                    <td>${payment.paymentType}</td>
+                    <td>${payment.paymentStatus}</td>
+                    <td>₹${payment.advanceAmountNow || '0'}</td>
+                    <td>₹${payment.remainingAmount || '0'}</td>
+                    <td>₹${payment.advanceAlreadyPaid || '0'}</td>
+                    <td>₹${payment.remainingBeingPaid || '0'}</td>
+                    <td>${payment.photo ? `<img src="${payment.photo}" alt="Customer Photo">` : 'No Photo'}</td>
+                    <td>${payment.submittedBy || 'Unknown'}</td>
+                `;
+                table.appendChild(row);
+            });
+
+            container.appendChild(table);
+        }
+
+        async function clearPayments() {
+            if (confirm("Are you sure you want to clear all payment history? This will delete data from both local and cloud storage.")) {
+                payments = [];
+                await savePayments();
+                showPayments();
+                alert("All payment history has been cleared!");
+            }
+        }
+
+        function showCustomerDetails() {
+            const customerDetails = document.getElementById("customerDetails").value;
+            if (customerDetails === "aadhar") {
+                stopCamera();
+                document.getElementById("aadharInput").style.display = "block";
+                document.getElementById("photoCapture").style.display = "none";
+            } else if (customerDetails === "takePhoto") {
+                document.getElementById("photoCapture").style.display = "block";
+                document.getElementById("aadharInput").style.display = "none";
+                startCamera();
+            }
+        }
+
+        function startCamera() {
+            const video = document.getElementById("video");
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    console.error("Error accessing camera:", err);
+                    alert("Camera access denied or not available.");
+                });
+        }
+
+        function stopCamera() {
+            const video = document.getElementById('video');
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+                video.srcObject = null;
+            }
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            
+            if (video.videoWidth === 0) {
+                alert("Camera not ready. Please try again.");
+                return;
+            }
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            photoDataUrl = canvas.toDataURL('image/png');
+            stopCamera();
+            
+            alert("Photo captured successfully!");
+        }
+
+        // ===== AUTO-SYNC FUNCTIONALITY =====
+        // Auto-save every 2 minutes if there are changes
+        setInterval(async () => {
+            if (payments.length > 0 && isOnline) {
+                await savePayments();
+                console.log('🔄 Auto-sync completed');
+            }
+        }, 120000); // 2 minutes
+
+        // ===== CONNECTION MONITORING =====
+        window.addEventListener('online', async () => {
+            console.log('🌐 Internet connection restored');
+            updateSyncStatus('Connection restored - syncing...', 'syncing');
+            await savePayments();
+        });
+
+        window.addEventListener('offline', () => {
+            console.log('📴 Internet connection lost');
+            updateSyncStatus('Offline mode - data saved locally', 'error');
+            isOnline = false;
+        });
+
+        // ===== ENHANCED ERROR HANDLING =====
+        window.addEventListener('error', (event) => {
+            console.error('Application error:', event.error);
+        });
+
+        window.addEventListener('unhandledrejection', (event) => {
+            console.error('Unhandled promise rejection:', event.reason);
+            event.preventDefault();
+        });
+
+        console.log('🏨 Sripada Maharaj Rooms with GitHub Storage initialized successfully!');
+        console.log('📋 Features available:');
+        console.log('- ✅ Cross-device data synchronization');
+        console.log('- 🔄 Automatic cloud backup');
+        console.log('- 📱 Offline mode with local backup');
+        console.log('- 🔒 Secure GitHub storage');
+        console.log('- 📊 Enhanced booking tracking');
+    </script>
+</body>
+</html>
